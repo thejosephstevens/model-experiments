@@ -35,17 +35,11 @@ src/model_experiments/
 #### Dataset Commands (`dataset.py`)
 ```bash
 model-experiments dataset download
-model-experiments dataset split
 ```
 
 **download** - Download datasets from HuggingFace Hub
 - Required: `--name`, `--output-dir`
 - Optional: `--max-samples`, `--cache-dir`
-
-**split** - Split dataset into train/validation sets
-- Required: `--input-path`, `--output-dir`, `--train-ratio`, `--val-ratio`
-- Optional: `--seed`, `--stratify`
-- Validation: Ensures ratios sum to 1.0
 
 #### Model Commands (`model.py`)
 ```bash
@@ -103,7 +97,6 @@ uv run model-experiments --help
 # Dataset commands
 uv run model-experiments dataset --help
 uv run model-experiments dataset download --help
-uv run model-experiments dataset split --help
 
 # Model commands
 uv run model-experiments model --help
@@ -189,7 +182,6 @@ All commands follow consistent patterns:
 
 ### ⏳ Not Yet Implemented
 - [ ] Dataset download logic
-- [ ] Dataset split logic
 - [ ] Model download logic
 - [ ] Training logic
 - [ ] Evaluation logic
@@ -241,20 +233,12 @@ uv run model-experiments dataset download \\
     --output-dir ./data \\
     --max-samples 1000
 
-# 2. Split dataset
-uv run model-experiments dataset split \\
-    --input-path ./data/imdb \\
-    --output-dir ./data/splits \\
-    --train-ratio 0.9 \\
-    --val-ratio 0.1 \\
-    --stratify
-
-# 3. Download model
+# 2. Download model
 uv run model-experiments model download \\
     --name distilbert-base-uncased \\
     --output-dir ./models/base
 
-# 4. Train model
+# 3. Train model
 uv run model-experiments train \\
     --model-name distilbert-base-uncased \\
     --train-data ./data/splits/train.jsonl \\
@@ -262,7 +246,7 @@ uv run model-experiments train \\
     --output-dir ./models/fine-tuned \\
     --epochs 3
 
-# 5. Evaluate models
+# 4. Evaluate models
 uv run model-experiments evaluate \\
     --model-path ./models/base \\
     --test-data ./data/splits/val.jsonl \\
@@ -273,7 +257,7 @@ uv run model-experiments evaluate \\
     --test-data ./data/splits/val.jsonl \\
     --output-file ./metrics/fine_tuned.json
 
-# 6. Compare performance
+# 5. Compare performance
 uv run model-experiments compare \\
     --baseline-metrics ./metrics/base.json \\
     --fine-tuned-metrics ./metrics/fine_tuned.json \\

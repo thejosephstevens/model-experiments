@@ -55,35 +55,6 @@ uv run model-experiments dataset download \
     --max-samples 1000
 ```
 
-#### Split Dataset
-```bash
-uv run model-experiments dataset split \
-    --input-path <path> \
-    --output-dir <path> \
-    --train-ratio <float> \
-    --val-ratio <float> \
-    [--seed <int>] \
-    [--stratify]
-```
-
-**Arguments:**
-- `--input-path`: Path to the downloaded dataset
-- `--output-dir`: Directory to save train/val splits
-- `--train-ratio`: Proportion for training (e.g., 0.9)
-- `--val-ratio`: Proportion for validation (e.g., 0.1)
-- `--seed`: Random seed for reproducibility (default: 42)
-- `--stratify`: Enable stratified splitting (maintains class distribution)
-
-**Example:**
-```bash
-uv run model-experiments dataset split \
-    --input-path ./data/imdb \
-    --output-dir ./data/splits \
-    --train-ratio 0.9 \
-    --val-ratio 0.1 \
-    --stratify
-```
-
 ### Model Commands
 
 #### Download Model
@@ -224,44 +195,42 @@ uv run model-experiments compare \
 
 ### Text Classification (IMDB Sentiment)
 ```bash
-# Download and prepare data
+# Download data
 uv run model-experiments dataset download --name imdb --output-dir ./data
-uv run model-experiments dataset split --input-path ./data/imdb --output-dir ./data/splits --train-ratio 0.9 --val-ratio 0.1
 
 # Fine-tune model
 uv run model-experiments model download --name distilbert-base-uncased --output-dir ./models/base
 uv run model-experiments train \
     --model-name distilbert-base-uncased \
-    --train-data ./data/splits/train.jsonl \
-    --val-data ./data/splits/val.jsonl \
+    --train-data ./data/imdb/train.jsonl \
+    --val-data ./data/imdb/validation.jsonl \
     --output-dir ./models/fine-tuned \
     --epochs 3
 
 # Evaluate and compare
-uv run model-experiments evaluate --model-path ./models/base --test-data ./data/splits/val.jsonl --output-file ./metrics/base.json
-uv run model-experiments evaluate --model-path ./models/fine-tuned --test-data ./data/splits/val.jsonl --output-file ./metrics/fine_tuned.json
+uv run model-experiments evaluate --model-path ./models/base --test-data ./data/imdb/validation.jsonl --output-file ./metrics/base.json
+uv run model-experiments evaluate --model-path ./models/fine-tuned --test-data ./data/imdb/validation.jsonl --output-file ./metrics/fine_tuned.json
 uv run model-experiments compare --baseline-metrics ./metrics/base.json --fine-tuned-metrics ./metrics/fine_tuned.json --output-dir ./comparison
 ```
 
 ### News Classification (AG News)
 ```bash
-# Download and prepare data
+# Download data
 uv run model-experiments dataset download --name ag_news --output-dir ./data --max-samples 5000
-uv run model-experiments dataset split --input-path ./data/ag_news --output-dir ./data/splits --train-ratio 0.9 --val-ratio 0.1 --stratify
 
 # Fine-tune smaller model for speed
 uv run model-experiments model download --name prajjwal1/bert-tiny --output-dir ./models/base
 uv run model-experiments train \
     --model-name prajjwal1/bert-tiny \
-    --train-data ./data/splits/train.jsonl \
-    --val-data ./data/splits/val.jsonl \
+    --train-data ./data/ag_news/train.jsonl \
+    --val-data ./data/ag_news/validation.jsonl \
     --output-dir ./models/fine-tuned \
     --epochs 5 \
     --batch-size 32
 
 # Evaluate and compare
-uv run model-experiments evaluate --model-path ./models/base --test-data ./data/splits/val.jsonl --output-file ./metrics/base.json
-uv run model-experiments evaluate --model-path ./models/fine-tuned --test-data ./data/splits/val.jsonl --output-file ./metrics/fine_tuned.json
+uv run model-experiments evaluate --model-path ./models/base --test-data ./data/ag_news/validation.jsonl --output-file ./metrics/base.json
+uv run model-experiments evaluate --model-path ./models/fine-tuned --test-data ./data/ag_news/validation.jsonl --output-file ./metrics/fine_tuned.json
 uv run model-experiments compare --baseline-metrics ./metrics/base.json --fine-tuned-metrics ./metrics/fine_tuned.json --output-dir ./comparison --generate-plots
 ```
 
@@ -273,9 +242,8 @@ After running a complete workflow, your output directory will look like:
 outputs/
 ├── data/
 │   ├── imdb/                    # Downloaded dataset
-│   └── splits/
-│       ├── train.jsonl          # Training data (90%)
-│       └── val.jsonl            # Validation data (10%)
+│   │   ├── train.jsonl
+│   │   └── validation.jsonl
 ├── models/
 │   ├── base/                    # Original base model
 │   │   ├── config.json

@@ -6,11 +6,10 @@ set -e  # Exit on error
 # =============================================================================
 # This script demonstrates the complete workflow for fine-tuning a model:
 # 1. Download dataset
-# 2. Split into train/validation sets (90%/10%)
-# 3. Download base model
-# 4. Train the model on training data
-# 5. Evaluate both original and fine-tuned models on validation data
-# 6. Compare performance metrics
+# 2. Download base model
+# 3. Train the model on training data
+# 4. Evaluate both original and fine-tuned models on validation data
+# 5. Compare performance metrics
 # =============================================================================
 
 echo "╔══════════════════════════════════════════════════════════════╗"
@@ -21,8 +20,6 @@ echo ""
 # Configuration
 DATASET_NAME="imdb"  # Example: IMDB sentiment analysis dataset
 MODEL_NAME="distilbert-base-uncased"  # Small, fast model for demo
-TRAIN_SPLIT="0.9"
-VAL_SPLIT="0.1"
 OUTPUT_DIR="./outputs"
 DATA_DIR="./data"
 MAX_SAMPLES="1000"  # Limit for faster demo
@@ -31,7 +28,6 @@ EPOCHS="3"
 echo "Configuration:"
 echo "  Dataset: $DATASET_NAME"
 echo "  Model: $MODEL_NAME"
-echo "  Train/Val Split: ${TRAIN_SPLIT}/${VAL_SPLIT}"
 echo "  Output Directory: $OUTPUT_DIR"
 echo "  Max Samples: $MAX_SAMPLES"
 echo "  Training Epochs: $EPOCHS"
@@ -41,7 +37,7 @@ echo ""
 # Step 1: Download Dataset
 # =============================================================================
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Step 1/6: Downloading dataset..."
+echo "Step 1/5: Downloading dataset..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 uv run model-experiments dataset download \
     --name "$DATASET_NAME" \
@@ -53,29 +49,10 @@ echo "✓ Dataset downloaded successfully"
 echo ""
 
 # =============================================================================
-# Step 2: Split Dataset
+# Step 2: Download Model
 # =============================================================================
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Step 2/6: Splitting dataset into train/validation sets..."
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-uv run model-experiments dataset split \
-    --input-path "$DATA_DIR/$DATASET_NAME" \
-    --output-dir "$DATA_DIR/splits" \
-    --train-ratio "$TRAIN_SPLIT" \
-    --val-ratio "$VAL_SPLIT" \
-    --seed 42 \
-    --stratify
-
-echo "✓ Dataset split completed"
-echo "  Training set: ${TRAIN_SPLIT} of data"
-echo "  Validation set: ${VAL_SPLIT} of data"
-echo ""
-
-# =============================================================================
-# Step 3: Download Model
-# =============================================================================
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Step 3/6: Downloading base model..."
+echo "Step 2/5: Downloading base model..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 uv run model-experiments model download \
     --name "$MODEL_NAME" \
@@ -86,15 +63,15 @@ echo "✓ Base model downloaded successfully"
 echo ""
 
 # =============================================================================
-# Step 4: Train Model
+# Step 3: Train Model
 # =============================================================================
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Step 4/6: Fine-tuning model on training data..."
+echo "Step 3/5: Fine-tuning model on training data..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 uv run model-experiments train \
     --model-name "$MODEL_NAME" \
-    --train-data "$DATA_DIR/splits/train.jsonl" \
-    --val-data "$DATA_DIR/splits/val.jsonl" \
+    --train-data "$DATA_DIR/$DATASET_NAME/train.jsonl" \
+    --val-data "$DATA_DIR/$DATASET_NAME/validation.jsonl" \
     --output-dir "$OUTPUT_DIR/models/fine-tuned" \
     --epochs "$EPOCHS" \
     --batch-size 16 \
@@ -112,17 +89,17 @@ echo "✓ Model fine-tuning completed"
 echo ""
 
 # =============================================================================
-# Step 5: Evaluate Models
+# Step 4: Evaluate Models
 # =============================================================================
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Step 5/6: Evaluating models on validation data..."
+echo "Step 4/5: Evaluating models on validation data..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 echo ""
 echo "Evaluating original base model..."
 uv run model-experiments evaluate \
     --model-path "$OUTPUT_DIR/models/base" \
-    --test-data "$DATA_DIR/splits/val.jsonl" \
+    --test-data "$DATA_DIR/$DATASET_NAME/validation.jsonl" \
     --output-file "$OUTPUT_DIR/metrics/base_model_metrics.json" \
     --batch-size 32 \
     --max-length 512 \
@@ -135,7 +112,7 @@ echo ""
 echo "Evaluating fine-tuned model..."
 uv run model-experiments evaluate \
     --model-path "$OUTPUT_DIR/models/fine-tuned" \
-    --test-data "$DATA_DIR/splits/val.jsonl" \
+    --test-data "$DATA_DIR/$DATASET_NAME/validation.jsonl" \
     --output-file "$OUTPUT_DIR/metrics/fine_tuned_metrics.json" \
     --batch-size 32 \
     --max-length 512 \
@@ -146,10 +123,10 @@ echo "✓ Fine-tuned model evaluation completed"
 echo ""
 
 # =============================================================================
-# Step 6: Compare Performance
+# Step 5: Compare Performance
 # =============================================================================
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Step 6/6: Comparing model performance..."
+echo "Step 5/5: Comparing model performance..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 uv run model-experiments compare \
     --baseline-metrics "$OUTPUT_DIR/metrics/base_model_metrics.json" \

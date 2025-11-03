@@ -20,42 +20,34 @@ echo ""
 echo "📥 Downloading dataset..."
 uv run model-experiments dataset download --name "$DATASET" --output-dir "$OUTPUT/data" --max-samples 500
 
-# 2. Split dataset (90/10)
-echo "✂️  Splitting dataset..."
-uv run model-experiments dataset split \
-    --input-path "$OUTPUT/data/$DATASET" \
-    --output-dir "$OUTPUT/data/splits" \
-    --train-ratio 0.9 \
-    --val-ratio 0.1
-
-# 3. Download model
+# 2. Download model
 echo "📦 Downloading model..."
 uv run model-experiments model download --name "$MODEL" --output-dir "$OUTPUT/models/base"
 
-# 4. Train model
+# 3. Train model
 echo "🏋️  Training model..."
 uv run model-experiments train \
     --model-name "$MODEL" \
-    --train-data "$OUTPUT/data/splits/train.jsonl" \
-    --val-data "$OUTPUT/data/splits/val.jsonl" \
+    --train-data "$OUTPUT/data/$DATASET/train.jsonl" \
+    --val-data "$OUTPUT/data/$DATASET/validation.jsonl" \
     --output-dir "$OUTPUT/models/fine-tuned" \
     --epochs 2 \
     --batch-size 16
 
-# 5. Evaluate both models
+# 4. Evaluate both models
 echo "📊 Evaluating base model..."
 uv run model-experiments evaluate \
     --model-path "$OUTPUT/models/base" \
-    --test-data "$OUTPUT/data/splits/val.jsonl" \
+    --test-data "$OUTPUT/data/$DATASET/validation.jsonl" \
     --output-file "$OUTPUT/metrics/base.json"
 
 echo "📊 Evaluating fine-tuned model..."
 uv run model-experiments evaluate \
     --model-path "$OUTPUT/models/fine-tuned" \
-    --test-data "$OUTPUT/data/splits/val.jsonl" \
+    --test-data "$OUTPUT/data/$DATASET/validation.jsonl" \
     --output-file "$OUTPUT/metrics/fine_tuned.json"
 
-# 6. Compare performance
+# 5. Compare performance
 echo "📈 Comparing performance..."
 uv run model-experiments compare \
     --baseline-metrics "$OUTPUT/metrics/base.json" \

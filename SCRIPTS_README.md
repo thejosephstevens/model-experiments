@@ -76,7 +76,7 @@ This shows all features and options:
 
 ## 📋 Complete Workflow Demonstrated
 
-Both scripts implement the following 6-step workflow:
+Both scripts implement the following 5-step workflow:
 
 ### Step 1: Download Dataset
 ```bash
@@ -88,20 +88,7 @@ uv run model-experiments dataset download \
 
 Downloads datasets from HuggingFace Hub (e.g., IMDB, AG News, etc.)
 
-### Step 2: Split Dataset (90% Train / 10% Validation)
-```bash
-uv run model-experiments dataset split \
-    --input-path <path> \
-    --output-dir <path> \
-    --train-ratio 0.9 \
-    --val-ratio 0.1 \
-    --seed 42 \
-    --stratify
-```
-
-Splits data while maintaining class distribution for balanced training.
-
-### Step 3: Download Model
+### Step 2: Download Model
 ```bash
 uv run model-experiments model download \
     --name <model_name> \
@@ -110,12 +97,12 @@ uv run model-experiments model download \
 
 Downloads pre-trained models from HuggingFace Hub.
 
-### Step 4: Train Model with Training Data
+### Step 3: Train Model with Training Data
 ```bash
 uv run model-experiments train \
     --model-name <name> \
     --train-data <path>/train.jsonl \
-    --val-data <path>/val.jsonl \
+    --val-data <path>/validation.jsonl \
     --output-dir <path> \
     --epochs <int> \
     --batch-size <int> \
@@ -125,12 +112,12 @@ uv run model-experiments train \
 
 Fine-tunes the model with comprehensive logging and metrics.
 
-### Step 5: Run Both Models Against Validation Data
+### Step 4: Run Both Models Against Validation Data
 ```bash
 # Evaluate original base model
 uv run model-experiments evaluate \
     --model-path <path>/base \
-    --test-data <path>/val.jsonl \
+    --test-data <path>/validation.jsonl \
     --output-file <path>/base_metrics.json \
     --metrics accuracy f1 precision recall \
     --log-predictions <path>/base_predictions.jsonl
@@ -138,7 +125,7 @@ uv run model-experiments evaluate \
 # Evaluate fine-tuned model
 uv run model-experiments evaluate \
     --model-path <path>/fine-tuned \
-    --test-data <path>/val.jsonl \
+    --test-data <path>/validation.jsonl \
     --output-file <path>/fine_tuned_metrics.json \
     --metrics accuracy f1 precision recall \
     --log-predictions <path>/fine_tuned_predictions.jsonl
@@ -146,7 +133,7 @@ uv run model-experiments evaluate \
 
 Records comprehensive metrics and prediction logs for analysis.
 
-### Step 6: Print Performance Comparison
+### Step 5: Print Performance Comparison
 ```bash
 uv run model-experiments compare \
     --baseline-metrics <path>/base_metrics.json \
@@ -166,9 +153,8 @@ After running a demo script, you'll have:
 demo_output/  (or ./outputs/)
 ├── data/
 │   ├── <dataset_name>/          # Raw downloaded data
-│   └── splits/
-│       ├── train.jsonl          # 90% of data
-│       └── val.jsonl            # 10% of data
+│   │   ├── train.jsonl
+│   │   └── validation.jsonl
 ├── models/
 │   ├── base/                    # Original model
 │   │   ├── config.json
@@ -346,8 +332,6 @@ bash quick_demo.sh
 Use this checklist to verify the implementation matches the scripts:
 
 - [ ] `dataset download` command works as shown
-- [ ] `dataset split` creates train.jsonl and val.jsonl
-- [ ] Split ratios are correctly applied (90/10)
 - [ ] `model download` fetches models successfully
 - [ ] `train` command fine-tunes and saves model
 - [ ] Training logs are generated

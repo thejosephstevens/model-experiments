@@ -35,7 +35,6 @@ $ uv run model-experiments --help
 
 **Dataset Management** (`dataset`)
 - `download` - Download datasets from HuggingFace Hub
-- `split` - Split into train/validation sets (90/10)
 
 **Model Management** (`model`)
 - `download` - Download pre-trained models from HuggingFace Hub
@@ -84,7 +83,6 @@ All commands match the specification from `demo_usage.sh` and `quick_demo.sh`:
 ```bash
 # Dataset commands
 uv run model-experiments dataset download --name imdb --output-dir ./data
-uv run model-experiments dataset split --input-path ./data/imdb --output-dir ./splits --train-ratio 0.9 --val-ratio 0.1
 
 # Model commands
 uv run model-experiments model download --name bert-base-uncased --output-dir ./models/base
@@ -140,7 +138,6 @@ uv run model-experiments --version              # ✅ Works
 uv run model-experiments --help                 # ✅ Works
 uv run model-experiments dataset --help         # ✅ Works
 uv run model-experiments dataset download --help # ✅ Works
-uv run model-experiments dataset split --help   # ✅ Works
 uv run model-experiments model --help           # ✅ Works
 uv run model-experiments model download --help  # ✅ Works
 uv run model-experiments train --help           # ✅ Works
@@ -295,7 +292,6 @@ Created comprehensive documentation:
 All commands match the specification exactly:
 ```bash
 uv run model-experiments dataset download --name X --output-dir Y
-uv run model-experiments dataset split --input-path X --output-dir Y --train-ratio 0.9 --val-ratio 0.1
 uv run model-experiments model download --name X --output-dir Y
 uv run model-experiments train --model-name X --train-data Y --val-data Z --output-dir W
 uv run model-experiments evaluate --model-path X --test-data Y --output-file Z

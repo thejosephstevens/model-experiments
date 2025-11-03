@@ -14,7 +14,6 @@ uv run model-experiments <command> <subcommand> [options]
 | Command | Subcommand | Description |
 |---------|-----------|-------------|
 | `dataset` | `download` | Download datasets from HuggingFace |
-| `dataset` | `split` | Split dataset into train/validation sets |
 | `model` | `download` | Download pre-trained models |
 | `train` | - | Fine-tune a model on training data |
 | `evaluate` | - | Evaluate model performance on test data |
@@ -29,31 +28,27 @@ uv run model-experiments <command> <subcommand> [options]
 # 1. Download dataset
 uv run model-experiments dataset download --name imdb --output-dir ./data
 
-# 2. Split dataset (90/10)
-uv run model-experiments dataset split --input-path ./data/imdb \
-    --output-dir ./data/splits --train-ratio 0.9 --val-ratio 0.1
-
-# 3. Download model
+# 2. Download model
 uv run model-experiments model download --name bert-base-uncased \
     --output-dir ./models/base
 
-# 4. Train model
+# 3. Train model
 uv run model-experiments train --model-name bert-base-uncased \
-    --train-data ./data/splits/train.jsonl \
-    --val-data ./data/splits/val.jsonl \
+    --train-data ./data/imdb/train.jsonl \
+    --val-data ./data/imdb/validation.jsonl \
     --output-dir ./models/fine-tuned
 
-# 5. Evaluate base model
+# 4. Evaluate base model
 uv run model-experiments evaluate --model-path ./models/base \
-    --test-data ./data/splits/val.jsonl \
+    --test-data ./data/imdb/validation.jsonl \
     --output-file ./metrics/base.json
 
-# 6. Evaluate fine-tuned model
+# 5. Evaluate fine-tuned model
 uv run model-experiments evaluate --model-path ./models/fine-tuned \
-    --test-data ./data/splits/val.jsonl \
+    --test-data ./data/imdb/validation.jsonl \
     --output-file ./metrics/fine_tuned.json
 
-# 7. Compare performance
+# 6. Compare performance
 uv run model-experiments compare \
     --baseline-metrics ./metrics/base.json \
     --fine-tuned-metrics ./metrics/fine_tuned.json \
@@ -61,8 +56,6 @@ uv run model-experiments compare \
 ```
 
 ---
-
-## Command Details
 
 ### `dataset download`
 **Purpose:** Download datasets from HuggingFace Hub
@@ -82,35 +75,6 @@ uv run model-experiments dataset download \
     --output-dir ./data \
     --max-samples 1000
 ```
-
----
-
-### `dataset split`
-**Purpose:** Split dataset into training and validation sets
-
-**Required:**
-- `--input-path` - Path to downloaded dataset
-- `--output-dir` - Where to save splits
-- `--train-ratio` - Training proportion (e.g., 0.9)
-- `--val-ratio` - Validation proportion (e.g., 0.1)
-
-**Optional:**
-- `--seed` - Random seed (default: 42)
-- `--stratify` - Maintain class distribution
-
-**Example:**
-```bash
-uv run model-experiments dataset split \
-    --input-path ./data/imdb \
-    --output-dir ./data/splits \
-    --train-ratio 0.9 \
-    --val-ratio 0.1 \
-    --stratify
-```
-
-**Outputs:**
-- `train.jsonl` - Training data
-- `val.jsonl` - Validation data
 
 ---
 
@@ -308,7 +272,6 @@ tail -f ./models/fine-tuned/logs/training_log.jsonl
 ### 💡 Reproducible Results
 ```bash
 # Always set --seed for reproducibility
-uv run model-experiments dataset split ... --seed 42
 uv run model-experiments train ... --seed 42
 ```
 

@@ -9,6 +9,8 @@ dependencies = [
     "rich>=13.0.0",
     "shellingham>=1.5.0",
     "datasets>=2.14.0",
+    "transformers>=4.30.0",
+    "huggingface_hub>=0.16.0",
 ]
 
 [project.scripts]
@@ -21,6 +23,13 @@ dev = [
     "black>=23.0.0",
     "ruff>=0.1.0",
     "mypy>=1.0.0",
+]
+torch-cpu = [
+    "torch>=2.0.0",
+]
+# To use GPU with CUDA 12.1, install with: uv sync --extra torch-gpu and then manually install torch[cu121]
+torch-gpu = [
+    "torch>=2.0.0",
 ]
 
 [build-system]

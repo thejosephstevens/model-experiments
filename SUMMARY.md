@@ -29,25 +29,14 @@ uv run model-experiments dataset download \
     --max-samples 1000
 ```
 
-### 2️⃣ Split Dataset (90% Train / 10% Validation)
-```bash
-uv run model-experiments dataset split \
-    --input-path "./data/imdb" \
-    --output-dir "./data/splits" \
-    --train-ratio 0.9 \
-    --val-ratio 0.1 \
-    --stratify
-```
-**Outputs:** `train.jsonl` (90%), `val.jsonl` (10%)
-
-### 3️⃣ Download Model
+### 2️⃣ Download Model
 ```bash
 uv run model-experiments model download \
     --name "distilbert-base-uncased" \
     --output-dir "./models/base"
 ```
 
-### 4️⃣ Train Model with Training Data
+### 3️⃣ Train Model with Training Data
 ```bash
 uv run model-experiments train \
     --model-name "distilbert-base-uncased" \
@@ -59,7 +48,7 @@ uv run model-experiments train \
     --fp16
 ```
 
-### 5️⃣ Evaluate Both Models on Validation Data
+### 4️⃣ Evaluate Both Models on Validation Data
 ```bash
 # Original base model
 uv run model-experiments evaluate \
@@ -77,7 +66,7 @@ uv run model-experiments evaluate \
 ```
 **Records:** Comprehensive metrics and performance data
 
-### 6️⃣ Print Performance Comparison
+### 5️⃣ Print Performance Comparison
 ```bash
 uv run model-experiments compare \
     --baseline-metrics "./metrics/base_metrics.json" \
