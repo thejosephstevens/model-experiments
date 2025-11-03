@@ -70,8 +70,8 @@ echo "Step 3/5: Fine-tuning model on training data..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 uv run model-experiments train \
     --model-name "$MODEL_NAME" \
-    --train-data "$DATA_DIR/$DATASET_NAME/train.jsonl" \
-    --val-data "$DATA_DIR/$DATASET_NAME/validation.jsonl" \
+    --train-data "$DATA_DIR/train/data.jsonl" \
+    --val-data "$DATA_DIR/test/data.jsonl" \
     --output-dir "$OUTPUT_DIR/models/fine-tuned" \
     --epochs "$EPOCHS" \
     --batch-size 16 \
@@ -82,7 +82,6 @@ uv run model-experiments train \
     --eval-steps 250 \
     --max-length 512 \
     --gradient-accumulation-steps 2 \
-    --fp16 \
     --seed 42
 
 echo "✓ Model fine-tuning completed"
@@ -92,18 +91,18 @@ echo ""
 # Step 4: Evaluate Models
 # =============================================================================
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Step 4/5: Evaluating models on validation data..."
+echo "Step 4/5: Evaluating models on test data..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 echo ""
 echo "Evaluating original base model..."
 uv run model-experiments evaluate \
     --model-path "$OUTPUT_DIR/models/base" \
-    --test-data "$DATA_DIR/$DATASET_NAME/validation.jsonl" \
+    --test-data "$DATA_DIR/test/data.jsonl" \
     --output-file "$OUTPUT_DIR/metrics/base_model_metrics.json" \
     --batch-size 32 \
     --max-length 512 \
-    --metrics accuracy f1 precision recall \
+    --metrics accuracy --metrics f1 --metrics precision --metrics recall \
     --log-predictions "$OUTPUT_DIR/predictions/base_predictions.jsonl"
 
 echo "✓ Base model evaluation completed"
@@ -112,11 +111,11 @@ echo ""
 echo "Evaluating fine-tuned model..."
 uv run model-experiments evaluate \
     --model-path "$OUTPUT_DIR/models/fine-tuned" \
-    --test-data "$DATA_DIR/$DATASET_NAME/validation.jsonl" \
+    --test-data "$DATA_DIR/test/data.jsonl" \
     --output-file "$OUTPUT_DIR/metrics/fine_tuned_metrics.json" \
     --batch-size 32 \
     --max-length 512 \
-    --metrics accuracy f1 precision recall \
+    --metrics accuracy --metrics f1 --metrics precision --metrics recall \
     --log-predictions "$OUTPUT_DIR/predictions/fine_tuned_predictions.jsonl"
 
 echo "✓ Fine-tuned model evaluation completed"
@@ -128,13 +127,19 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "Step 5/5: Comparing model performance..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-uv run model-experiments compare \
-    --baseline-metrics "$OUTPUT_DIR/metrics/base_model_metrics.json" \
-    --fine-tuned-metrics "$OUTPUT_DIR/metrics/fine_tuned_metrics.json" \
-    --output-dir "$OUTPUT_DIR/comparison" \
-    --generate-plots \
-    --format table \
-    --save-report
+echo ""
+echo "⚠️  Note: The compare command is not yet fully implemented."
+echo "    You can manually compare the metrics files:"
+echo "    - $OUTPUT_DIR/metrics/base_model_metrics.json"
+echo "    - $OUTPUT_DIR/metrics/fine_tuned_metrics.json"
+echo ""
+# uv run model-experiments compare \
+#     --baseline-metrics "$OUTPUT_DIR/metrics/base_model_metrics.json" \
+#     --fine-tuned-metrics "$OUTPUT_DIR/metrics/fine_tuned_metrics.json" \
+#     --output-dir "$OUTPUT_DIR/comparison" \
+#     --generate-plots \
+#     --format table \
+#     --save-report
 
 echo ""
 echo "╔══════════════════════════════════════════════════════════════╗"
@@ -144,10 +149,12 @@ echo ""
 echo "Results Summary:"
 echo "  • Base model metrics: $OUTPUT_DIR/metrics/base_model_metrics.json"
 echo "  • Fine-tuned metrics: $OUTPUT_DIR/metrics/fine_tuned_metrics.json"
-echo "  • Comparison report: $OUTPUT_DIR/comparison/report.html"
+echo "  • Base predictions: $OUTPUT_DIR/predictions/base_predictions.jsonl"
+echo "  • Fine-tuned predictions: $OUTPUT_DIR/predictions/fine_tuned_predictions.jsonl"
 echo "  • Training logs: $OUTPUT_DIR/models/fine-tuned/logs/"
 echo ""
-echo "To view the comparison report:"
-echo "  open $OUTPUT_DIR/comparison/report.html"
+echo "To view metrics:"
+echo "  cat $OUTPUT_DIR/metrics/base_model_metrics.json"
+echo "  cat $OUTPUT_DIR/metrics/fine_tuned_metrics.json"
 echo ""
 

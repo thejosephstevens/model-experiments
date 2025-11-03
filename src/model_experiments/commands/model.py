@@ -7,7 +7,7 @@ from typing import Optional
 import typer
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
-from transformers import AutoModel, AutoTokenizer
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 app = typer.Typer(help="Model management commands")
 console = Console()
@@ -67,8 +67,9 @@ def download(
         ) as progress:
             progress.add_task(description="Downloading model from HuggingFace Hub...", total=None)
 
-            # Load and save model
-            model = AutoModel.from_pretrained(name, **cache_kwargs)
+            # Load and save model with classification head
+            # Using num_labels=2 for binary classification (common use case)
+            model = AutoModelForSequenceClassification.from_pretrained(name, num_labels=2, **cache_kwargs)
             model.save_pretrained(str(output_dir))
 
         console.print("[green]✓[/green] Model downloaded successfully")

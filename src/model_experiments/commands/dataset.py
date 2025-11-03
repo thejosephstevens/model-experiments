@@ -77,9 +77,10 @@ def download(
         for split_name, split_data in dataset.items():
             # Limit samples if max_samples is specified
             if max_samples and len(split_data) > max_samples:
-                split_data = split_data.select(range(max_samples))
+                # Shuffle before selecting to ensure balanced classes
+                split_data = split_data.shuffle(seed=42).select(range(max_samples))
                 console.print(
-                    f"[dim]  Split '{split_name}': Limited to {max_samples} samples[/dim]"
+                    f"[dim]  Split '{split_name}': Limited to {max_samples} samples (shuffled)[/dim]"
                 )
             else:
                 console.print(f"[dim]  Split '{split_name}': {len(split_data)} samples[/dim]")

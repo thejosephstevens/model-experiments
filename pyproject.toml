@@ -11,6 +11,8 @@ dependencies = [
     "datasets>=2.14.0",
     "transformers>=4.30.0",
     "huggingface_hub>=0.16.0",
+    "scikit-learn>=1.3.0",
+    "accelerate>=0.26.0",
 ]
 
 [project.scripts]
@@ -59,3 +61,10 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --cov=src/model_experiments --cov-report=term-missing"
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple/"
+
+[[tool.uv.index]]
+url = "https://us-python.pkg.dev/ascend-io-ops-artifacts/private-pypi/simple/"
+default = true
