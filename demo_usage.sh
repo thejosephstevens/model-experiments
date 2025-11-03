@@ -128,18 +128,17 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "Step 5/5: Comparing model performance..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "⚠️  Note: The compare command is not yet fully implemented."
-echo "    You can manually compare the metrics files:"
-echo "    - $OUTPUT_DIR/metrics/base_model_metrics.json"
-echo "    - $OUTPUT_DIR/metrics/fine_tuned_metrics.json"
+
+uv run model-experiments compare \
+    --baseline-metrics "$OUTPUT_DIR/metrics/base_model_metrics.json" \
+    --fine-tuned-metrics "$OUTPUT_DIR/metrics/fine_tuned_metrics.json" \
+    --output-dir "$OUTPUT_DIR/comparison" \
+    --generate-plots \
+    --format table \
+    --save-report
+
+echo "✓ Model comparison completed"
 echo ""
-# uv run model-experiments compare \
-#     --baseline-metrics "$OUTPUT_DIR/metrics/base_model_metrics.json" \
-#     --fine-tuned-metrics "$OUTPUT_DIR/metrics/fine_tuned_metrics.json" \
-#     --output-dir "$OUTPUT_DIR/comparison" \
-#     --generate-plots \
-#     --format table \
-#     --save-report
 
 echo ""
 echo "╔══════════════════════════════════════════════════════════════╗"
