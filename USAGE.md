@@ -38,7 +38,8 @@ uv run model-experiments dataset download \
     --name <dataset_name> \
     --output-dir <path> \
     [--max-samples <int>] \
-    [--cache-dir <path>]
+    [--cache-dir <path>] \
+    [--force]
 ```
 
 **Arguments:**
@@ -46,13 +47,31 @@ uv run model-experiments dataset download \
 - `--output-dir`: Directory to save the dataset
 - `--max-samples`: Optional limit on number of samples to download
 - `--cache-dir`: Optional cache directory for HuggingFace datasets
+- `--force`: Force re-download even if dataset already exists (bypasses cache)
+
+**Caching:**
+The command automatically caches downloaded datasets in the `--output-dir`. If you run the same command again with the same parameters, it will use the cached version instead of re-downloading. This is useful when working with limited internet connectivity.
 
 **Example:**
 ```bash
+# First download - fetches from HuggingFace
 uv run model-experiments dataset download \
     --name imdb \
     --output-dir ./data \
     --max-samples 1000
+
+# Second run - uses cached version (instant)
+uv run model-experiments dataset download \
+    --name imdb \
+    --output-dir ./data \
+    --max-samples 1000
+
+# Force re-download if needed
+uv run model-experiments dataset download \
+    --name imdb \
+    --output-dir ./data \
+    --max-samples 1000 \
+    --force
 ```
 
 ### Model Commands
@@ -62,19 +81,36 @@ uv run model-experiments dataset download \
 uv run model-experiments model download \
     --name <model_name> \
     --output-dir <path> \
-    [--cache-dir <path>]
+    [--cache-dir <path>] \
+    [--force]
 ```
 
 **Arguments:**
 - `--name`: HuggingFace model name (e.g., "bert-base-uncased")
 - `--output-dir`: Directory to save the model
 - `--cache-dir`: Optional cache directory
+- `--force`: Force re-download even if model already exists (bypasses cache)
+
+**Caching:**
+The command automatically caches downloaded models in the `--output-dir`. If you run the same command again with the same model name, it will use the cached version instead of re-downloading. This is useful when working with limited internet connectivity.
 
 **Example:**
 ```bash
+# First download - fetches from HuggingFace
 uv run model-experiments model download \
     --name distilbert-base-uncased \
     --output-dir ./models/base
+
+# Second run - uses cached version (instant)
+uv run model-experiments model download \
+    --name distilbert-base-uncased \
+    --output-dir ./models/base
+
+# Force re-download if needed
+uv run model-experiments model download \
+    --name distilbert-base-uncased \
+    --output-dir ./models/base \
+    --force
 ```
 
 ### Training

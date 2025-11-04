@@ -35,6 +35,11 @@ def download(
         "--cache-dir",
         help="HuggingFace cache directory",
     ),
+    force: bool = typer.Option(
+        False,
+        "--force",
+        help="Force re-download even if dataset already exists",
+    ),
 ) -> None:
     """
     Download a dataset from HuggingFace Hub.
@@ -43,6 +48,8 @@ def download(
         model-experiments dataset download --name imdb --output-dir ./data
 
         model-experiments dataset download --name ag_news --output-dir ./data --max-samples 1000
+
+        model-experiments dataset download --name imdb --output-dir ./data --force
     """
     console.print(f"[bold blue]Downloading dataset:[/bold blue] {name}")
     console.print(f"[dim]Output directory: {output_dir}[/dim]")
@@ -52,6 +59,36 @@ def download(
     try:
         # Create output directory if it doesn't exist
         output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Check if dataset already exists (unless force flag is set)
+        metadata_file = output_dir / "metadata.json"
+        if not force and metadata_file.exists():
+            try:
+                with open(metadata_file, "r", encoding="utf-8") as f:
+                    metadata = json.load(f)
+                
+                # Verify the cached dataset is for the same dataset name and config
+                if metadata.get("name") == name and metadata.get("max_samples") == max_samples:
+                    # Check if at least one split exists
+                    splits = metadata.get("splits", [])
+                    if splits and all((output_dir / split / "data.jsonl").exists() for split in splits):
+                        console.print("[yellow]ℹ[/yellow] Dataset already downloaded and cached")
+                        console.print(f"[dim]Using cached dataset from {output_dir}[/dim]")
+                        console.print(f"[dim]Splits: {', '.join(splits)}[/dim]")
+                        console.print(f"[dim]Total samples: {metadata.get('total_samples', 'unknown')}[/dim]")
+                        console.print("[dim]Use --force to re-download[/dim]")
+                        return
+                    else:
+                        console.print("[yellow]⚠[/yellow] Cache incomplete, re-downloading...")
+                else:
+                    if metadata.get("name") != name:
+                        console.print(f"[yellow]⚠[/yellow] Cache is for different dataset ({metadata.get('name')}), downloading {name}...")
+                    else:
+                        console.print(f"[yellow]⚠[/yellow] Cache has different max_samples ({metadata.get('max_samples')} vs {max_samples}), re-downloading...")
+            except (json.JSONDecodeError, KeyError) as e:
+                console.print(f"[yellow]⚠[/yellow] Cache metadata corrupted, re-downloading...")
+        elif force:
+            console.print("[dim]Force flag set, re-downloading...[/dim]")
 
         # Set cache directory if provided
         cache_kwargs = {}

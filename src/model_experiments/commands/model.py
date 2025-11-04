@@ -30,6 +30,11 @@ def download(
         "--cache-dir",
         help="HuggingFace cache directory",
     ),
+    force: bool = typer.Option(
+        False,
+        "--force",
+        help="Force re-download even if model already exists",
+    ),
 ) -> None:
     """
     Download a pre-trained model from HuggingFace Hub.
@@ -43,6 +48,11 @@ def download(
             --name bert-base-uncased \\
             --output-dir ./models/base \\
             --cache-dir ./cache
+
+        model-experiments model download \\
+            --name bert-base-uncased \\
+            --output-dir ./models/base \\
+            --force
     """
     console.print(f"[bold blue]Downloading model:[/bold blue] {name}")
     console.print(f"[dim]Output directory: {output_dir}[/dim]")
@@ -52,6 +62,31 @@ def download(
     try:
         # Create output directory if it doesn't exist
         output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Check if model already exists (unless force flag is set)
+        metadata_file = output_dir / "model_metadata.json"
+        if not force and metadata_file.exists():
+            try:
+                with open(metadata_file, "r", encoding="utf-8") as f:
+                    metadata = json.load(f)
+                
+                # Verify the cached model is for the same model name
+                if metadata.get("name") == name:
+                    # Check if essential files exist
+                    config_file = output_dir / "config.json"
+                    if config_file.exists():
+                        console.print("[yellow]ℹ[/yellow] Model already downloaded and cached")
+                        console.print(f"[dim]Using cached model from {output_dir}[/dim]")
+                        console.print("[dim]Use --force to re-download[/dim]")
+                        return
+                    else:
+                        console.print("[yellow]⚠[/yellow] Cache incomplete, re-downloading...")
+                else:
+                    console.print(f"[yellow]⚠[/yellow] Cache is for different model ({metadata.get('name')}), downloading {name}...")
+            except (json.JSONDecodeError, KeyError) as e:
+                console.print(f"[yellow]⚠[/yellow] Cache metadata corrupted, re-downloading...")
+        elif force:
+            console.print("[dim]Force flag set, re-downloading...[/dim]")
 
         # Set cache directory if provided
         cache_kwargs = {}

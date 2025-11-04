@@ -35,10 +35,18 @@ ENV/
 
 # Project specific
 outputs/
+cache/
+data/
+data/cache/
 .cache/
 *.log
 runs/
 checkpoints/
+test_output.log
+.localonly/
+test_cache_model/
+test_cache_dataset/
+models/
 
 # Model files (too large for git)
 *.bin
@@ -48,11 +56,12 @@ checkpoints/
 *.ckpt
 
 # Data
-data/
+data/cache/
 datasets/
 *.csv
-*.json
 *.parquet
+*.arrow
+*.lock
 
 # Jupyter
 .ipynb_checkpoints/
@@ -74,3 +83,16 @@ dmypy.json
 
 # Ruff
 .ruff_cache/
+
+# UV
+uv.lock
+.venv/
+
+# Testing artifacts
+test_models/
+test_*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
