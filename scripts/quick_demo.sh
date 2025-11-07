@@ -28,8 +28,8 @@ uv run model-experiments model download --name "$MODEL" --output-dir "$OUTPUT/mo
 echo "🏋️  Training model..."
 uv run model-experiments train \
     --model-name "$MODEL" \
-    --train-data "$OUTPUT/data/$DATASET/train.jsonl" \
-    --val-data "$OUTPUT/data/$DATASET/validation.jsonl" \
+    --train-data "$OUTPUT/data/train/data.jsonl" \
+    --val-data "$OUTPUT/data/test/data.jsonl" \
     --output-dir "$OUTPUT/models/fine-tuned" \
     --epochs 2 \
     --batch-size 16
@@ -38,13 +38,13 @@ uv run model-experiments train \
 echo "📊 Evaluating base model..."
 uv run model-experiments evaluate \
     --model-path "$OUTPUT/models/base" \
-    --test-data "$OUTPUT/data/$DATASET/validation.jsonl" \
+    --test-data "$OUTPUT/data/test/data.jsonl" \
     --output-file "$OUTPUT/metrics/base.json"
 
 echo "📊 Evaluating fine-tuned model..."
 uv run model-experiments evaluate \
     --model-path "$OUTPUT/models/fine-tuned" \
-    --test-data "$OUTPUT/data/$DATASET/validation.jsonl" \
+    --test-data "$OUTPUT/data/test/data.jsonl" \
     --output-file "$OUTPUT/metrics/fine_tuned.json"
 
 # 5. Compare performance
