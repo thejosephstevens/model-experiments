@@ -161,6 +161,154 @@ outputs/
 └── comparison/       # Comparison reports
 ```
 
+## Distilbert imdb tuning example
+To validate this framework, I tuned a DistilBERT model on the IMDB dataset. The resulting model can be found on my HuggingFace profile [here](https://huggingface.co/thejostevens/distilbert-imdb-finetuned). The results are as follows (trimmed for brevity):
+```
+uv run model-experiments run-experiment \
+    --dataset-name imdb \
+    --model-name distilbert-base-uncased \
+    --profile default
+.....trimmed for brevity.....
+═══════════════════════════════════════
+Step 4/6: Evaluating Base Model
+═══════════════════════════════════════
+
+Evaluation Configuration
+Model: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/models/base
+Test data: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/data/test/data.jsonl
+Output file: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/metrics/base_model_metrics.json
+Batch size: 32
+Metrics: accuracy, f1, precision, recall
+Predictions log: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/predictions/base_predictions.jsonl
+
+Step 1/3: Loading data
+⠋ Loading test data...
+✓ Loaded 1000 test samples
+
+Step 2/3: Loading model
+⠋ Loading model from path...
+✓ Model and tokenizer loaded successfully
+Device set to use cpu
+
+Step 3/3: Running inference
+This may take a while depending on dataset size...
+  Running inference...
+✓ Inference completed
+
+Computing metrics...
+✓ Metrics saved to experiments/exp_20251107_141415_imdb_distilbert-base-uncased/metrics/base_model_metrics.json
+✓ Predictions saved to experiments/exp_20251107_141415_imdb_distilbert-base-uncased/predictions/base_predictions.jsonl
+
+═══════════════════════════════════════
+Evaluation Complete!
+═══════════════════════════════════════
+✓ Model: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/models/base
+✓ Samples evaluated: 1000
+✓ Metrics computed: accuracy, f1, precision, recall
+
+Metrics Results:
+  Accuracy: 0.5270
+  F1: 0.4898
+  Precision: 0.5483
+  Recall: 0.5270
+
+═══════════════════════════════════════
+Step 5/6: Evaluating Fine-tuned Model
+═══════════════════════════════════════
+
+Evaluation Configuration
+Model: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/models/fine-tuned
+Test data: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/data/test/data.jsonl
+Output file: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/metrics/fine_tuned_metrics.json
+Batch size: 32
+Metrics: accuracy, f1, precision, recall
+Predictions log: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/predictions/fine_tuned_predictions.jsonl
+
+Step 1/3: Loading data
+⠋ Loading test data...
+✓ Loaded 1000 test samples
+
+Step 2/3: Loading model
+⠋ Loading model from path...
+✓ Model and tokenizer loaded successfully
+Device set to use cpu
+
+Step 3/3: Running inference
+This may take a while depending on dataset size...
+  Running inference...
+✓ Inference completed
+
+Computing metrics...
+✓ Metrics saved to experiments/exp_20251107_141415_imdb_distilbert-base-uncased/metrics/fine_tuned_metrics.json
+✓ Predictions saved to experiments/exp_20251107_141415_imdb_distilbert-base-uncased/predictions/fine_tuned_predictions.jsonl
+
+═══════════════════════════════════════
+Evaluation Complete!
+═══════════════════════════════════════
+✓ Model: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/models/fine-tuned
+✓ Samples evaluated: 1000
+✓ Metrics computed: accuracy, f1, precision, recall
+
+Metrics Results:
+  Accuracy: 0.8600
+  F1: 0.8599
+  Precision: 0.8604
+  Recall: 0.8600
+
+═══════════════════════════════════════
+Step 6/6: Comparing Model Performance
+═══════════════════════════════════════
+
+Comparison Configuration
+Baseline metrics: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/metrics/base_model_metrics.json
+Fine-tuned metrics: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/metrics/fine_tuned_metrics.json
+Output directory: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/comparison
+Format: table
+Generate plots: True
+Save report: True
+
+Step 1/2: Loading metrics
+⠋ Loading baseline metrics...
+⠋ Loading fine-tuned metrics...
+✓ Metrics loaded successfully
+
+Step 2/2: Computing comparison
+⠋ Calculating differences...
+✓ Comparison computed
+
+Results (TABLE Format)
+                Model Performance Comparison
+┏━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━┓
+┃ Metric    ┃ Baseline ┃ Fine-Tuned ┃ Difference ┃ % Change ┃
+┡━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━┩
+│ Accuracy  │   0.5270 │     0.8600 │    +0.3330 │  +63.19% │
+│ F1        │   0.4898 │     0.8599 │    +0.3700 │  +75.54% │
+│ Precision │   0.5483 │     0.8604 │    +0.3121 │  +56.92% │
+│ Recall    │   0.5270 │     0.8600 │    +0.3330 │  +63.19% │
+└───────────┴──────────┴────────────┴────────────┴──────────┘
+
+Generating HTML report
+✓ HTML report saved to experiments/exp_20251107_141415_imdb_distilbert-base-uncased/comparison/report.html
+
+Generating plots
+⚠ matplotlib not installed, skipping plot generation
+
+═══════════════════════════════════════
+Comparison Complete!
+═══════════════════════════════════════
+✓ Baseline model: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/models/base
+✓ Fine-tuned model: experiments/exp_20251107_141415_imdb_distilbert-base-uncased/models/fine-tuned
+✓ Samples evaluated: 1000
+
+Summary:
+  Metrics improved: 4/4
+
+Top Improvements:
+  • F1: +75.54%
+  • Accuracy: +63.19%
+  • Recall: +63.19%
+```
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
