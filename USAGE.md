@@ -113,6 +113,52 @@ uv run model-experiments model download \
     --force
 ```
 
+#### Upload Model
+```bash
+uv run model-experiments model upload \
+    --model-dir <path> \
+    --repo-id <username/model-name> \
+    [--commit-message <message>] \
+    [--private]
+```
+
+**Arguments:**
+- `--model-dir`: Directory containing the fine-tuned model files
+- `--repo-id`: HuggingFace Hub repository ID (e.g., "my-username/my-model")
+- `--commit-message`: Optional commit message for the upload
+- `--private`: Optional flag to make the repository private
+
+**Setup Requirements:**
+Before uploading, you need to install and authenticate with the HuggingFace Hub CLI:
+
+```bash
+# Install the HF CLI
+curl -LsSf https://hf.co/cli/install.sh | bash
+
+# Authenticate with your HuggingFace credentials
+huggingface-cli login
+```
+
+**Example:**
+```bash
+# Basic upload
+uv run model-experiments model upload \
+    --model-dir ./models/fine-tuned \
+    --repo-id my-username/sentiment-classifier
+
+# Upload with commit message
+uv run model-experiments model upload \
+    --model-dir ./models/fine-tuned \
+    --repo-id my-username/sentiment-classifier \
+    --commit-message "v1.0: Fine-tuned on IMDB dataset"
+
+# Upload to a private repository
+uv run model-experiments model upload \
+    --model-dir ./models/fine-tuned \
+    --repo-id my-username/sentiment-classifier \
+    --private
+```
+
 ### Training
 
 #### Train Model

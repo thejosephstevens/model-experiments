@@ -15,6 +15,7 @@ uv run model-experiments <command> <subcommand> [options]
 |---------|-----------|-------------|
 | `dataset` | `download` | Download datasets from HuggingFace |
 | `model` | `download` | Download pre-trained models |
+| `model` | `upload` | Upload models to HuggingFace Hub |
 | `train` | - | Fine-tune a model on training data |
 | `evaluate` | - | Evaluate model performance on test data |
 | `compare` | - | Compare baseline vs fine-tuned model metrics |
@@ -93,6 +94,50 @@ uv run model-experiments dataset download \
 uv run model-experiments model download \
     --name distilbert-base-uncased \
     --output-dir ./models/base
+```
+
+---
+
+### `model upload`
+**Purpose:** Upload a fine-tuned model to HuggingFace Hub
+
+**Prerequisites:**
+First, install the HuggingFace Hub CLI:
+```bash
+curl -LsSf https://hf.co/cli/install.sh | bash
+```
+
+Then, authenticate with your HuggingFace credentials:
+```bash
+hf auth login
+```
+
+**Required:**
+- `--model-dir` - Directory containing the model files to upload
+- `--repo-id` - HuggingFace Hub repository ID (e.g., "username/model-name")
+
+**Optional:**
+- `--commit-message, -m` - Commit message for the upload
+- `--private` - Make the repository private
+
+**Example:**
+```bash
+# Basic upload
+uv run model-experiments model upload \
+    --model-dir ./models/fine-tuned \
+    --repo-id my-username/my-model
+
+# With commit message
+uv run model-experiments model upload \
+    --model-dir ./models/fine-tuned \
+    --repo-id my-username/my-model \
+    --commit-message "v1.0: Initial fine-tuned model"
+
+# Private repository
+uv run model-experiments model upload \
+    --model-dir ./models/fine-tuned \
+    --repo-id my-username/my-model \
+    --private
 ```
 
 ---

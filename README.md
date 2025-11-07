@@ -4,12 +4,27 @@ A modular framework for fine-tuning language models with comprehensive evaluatio
 
 ## 🚀 Quick Start
 
-Run the quick demo to see the framework in action:
+### First Time Setup
+
+If you're setting up this project for the first time, run the bootstrap script:
 
 ```bash
-# Install dependencies (using UV package manager)
-uv sync
+# Run bootstrap script (installs uv and all dependencies)
+./bootstrap.sh
+```
 
+The bootstrap script will:
+- Install `uv` package manager (if not already installed)
+- Set up Python 3.12+ environment
+- Install all project dependencies
+- Install PyTorch (prompts for CPU or GPU version)
+- Verify the installation
+
+### Run the Demo
+
+After setup, run the quick demo to see the framework in action:
+
+```bash
 # Run the quick demo
 ./quick_demo.sh
 ```
@@ -18,10 +33,11 @@ This will download a small dataset, fine-tune a model, and generate a performanc
 
 ## 📋 Prerequisites
 
-- Python 3.12+
-- UV package manager ([install UV](https://docs.astral.sh/uv/getting-started/installation/))
+- Python 3.12+ (automatically managed by uv)
 - 4GB+ RAM for small models
 - GPU optional (CPU-only mode supported)
+
+**Note:** The bootstrap script will install `uv` for you, so you don't need to install it manually.
 
 ## 🛠️ Installation
 
@@ -30,11 +46,14 @@ This will download a small dataset, fine-tune a model, and generate a performanc
 git clone https://github.com/thejosephstevens/model-experiments.git
 cd model-experiments
 
-# Install dependencies with UV
-uv sync
+# Run bootstrap script (recommended for first-time setup)
+# This will prompt you for CPU vs GPU PyTorch installation
+./bootstrap.sh
 
-# (Optional) For GPU support with CUDA
-uv sync --extra torch-gpu
+# Or manually install dependencies with UV
+uv sync
+uv sync --extra torch-cpu    # For CPU-only
+uv sync --extra torch-gpu    # For GPU with CUDA support
 ```
 
 ## 🎯 Features
