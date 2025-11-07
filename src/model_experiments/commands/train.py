@@ -7,6 +7,7 @@ import os
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 os.environ["PYTORCH_MPS_PREFER_METAL"] = "0"
 
+import hashlib
 import json
 from pathlib import Path
 from typing import Optional
@@ -34,6 +35,136 @@ def load_jsonl_data(file_path: Path) -> list[dict]:
             if line.strip():
                 data.append(json.loads(line))
     return data
+
+
+def _compute_training_hash(
+    model_name: str,
+    epochs: int,
+    batch_size: int,
+    learning_rate: float,
+    warmup_steps: int,
+    save_steps: int,
+    logging_steps: int,
+    eval_steps: int,
+    max_length: int,
+    gradient_accumulation_steps: int,
+    fp16: bool,
+    seed: int,
+) -> str:
+    """Compute a hash of all training parameters for cache validation."""
+    # Create a dictionary of all parameters
+    params = {
+        "model_name": model_name,
+        "epochs": epochs,
+        "batch_size": batch_size,
+        "learning_rate": learning_rate,
+        "warmup_steps": warmup_steps,
+        "save_steps": save_steps,
+        "logging_steps": logging_steps,
+        "eval_steps": eval_steps,
+        "max_length": max_length,
+        "gradient_accumulation_steps": gradient_accumulation_steps,
+        "fp16": fp16,
+        "seed": seed,
+    }
+    
+    # Create a stable string representation
+    params_str = json.dumps(params, sort_keys=True)
+    
+    # Compute SHA256 hash
+    return hashlib.sha256(params_str.encode()).hexdigest()
+
+
+def _check_cache(
+    output_dir: Path,
+    model_name: str,
+    train_data: Path,
+    val_data: Path,
+    config_hash: str,
+) -> bool:
+    """
+    Check if a valid training cache exists.
+    
+    Returns True if cache is valid and can be used, False otherwise.
+    """
+    metadata_file = output_dir / "training_metadata.json"
+    
+    # Check if metadata file exists
+    if not metadata_file.exists():
+        return False
+    
+    try:
+        with open(metadata_file, "r", encoding="utf-8") as f:
+            metadata = json.load(f)
+        
+        # Check if training completed successfully
+        if not metadata.get("completed", False):
+            console.print("[yellow]⚠[/yellow] Previous training incomplete, re-training...")
+            return False
+        
+        # Check if model name matches
+        if metadata.get("model_name") != model_name:
+            console.print(
+                f"[yellow]⚠[/yellow] Cache is for different model "
+                f"({metadata.get('model_name')}), training {model_name}..."
+            )
+            return False
+        
+        # Check if config hash matches
+        if metadata.get("config_hash") != config_hash:
+            console.print("[yellow]⚠[/yellow] Training configuration changed, re-training...")
+            return False
+        
+        # Check if dataset paths match
+        if metadata.get("train_data_path") != str(train_data):
+            console.print("[yellow]⚠[/yellow] Training data path changed, re-training...")
+            return False
+        
+        if metadata.get("val_data_path") != str(val_data):
+            console.print("[yellow]⚠[/yellow] Validation data path changed, re-training...")
+            return False
+        
+        # Check if dataset files still exist
+        if not train_data.exists():
+            console.print("[yellow]⚠[/yellow] Training data file no longer exists, re-training...")
+            return False
+        
+        if not val_data.exists():
+            console.print("[yellow]⚠[/yellow] Validation data file no longer exists, re-training...")
+            return False
+        
+        # Check if dataset modification times match
+        train_mtime = train_data.stat().st_mtime
+        val_mtime = val_data.stat().st_mtime
+        
+        if metadata.get("train_data_mtime") != train_mtime:
+            console.print("[yellow]⚠[/yellow] Training data has been modified, re-training...")
+            return False
+        
+        if metadata.get("val_data_mtime") != val_mtime:
+            console.print("[yellow]⚠[/yellow] Validation data has been modified, re-training...")
+            return False
+        
+        # Check if essential model files exist
+        config_file = output_dir / "config.json"
+        if not config_file.exists():
+            console.print("[yellow]⚠[/yellow] Model config file missing, re-training...")
+            return False
+        
+        # Check for model weights (either safetensors or pytorch_model.bin)
+        safetensors_file = output_dir / "model.safetensors"
+        pytorch_file = output_dir / "pytorch_model.bin"
+        
+        if not safetensors_file.exists() and not pytorch_file.exists():
+            console.print("[yellow]⚠[/yellow] Model weights missing, re-training...")
+            return False
+        
+        # Cache is valid
+        return True
+        
+    except (json.JSONDecodeError, KeyError, OSError) as e:
+        console.print(f"[yellow]⚠[/yellow] Cache metadata corrupted ({str(e)}), re-training...")
+        return False
 
 
 def train(
@@ -112,6 +243,11 @@ def train(
         "--seed",
         help="Random seed for reproducibility",
     ),
+    force: bool = typer.Option(
+        False,
+        "--force",
+        help="Force re-training even if model already trained with same config",
+    ),
 ) -> None:
     """
     Fine-tune a model on training data.
@@ -145,6 +281,52 @@ def train(
     if not val_data.exists():
         console.print(f"[red]Error: Validation data not found: {val_data}[/red]")
         raise typer.Exit(1)
+
+    # Compute configuration hash for cache validation
+    config_hash = _compute_training_hash(
+        model_name=model_name,
+        epochs=epochs,
+        batch_size=batch_size,
+        learning_rate=learning_rate,
+        warmup_steps=warmup_steps,
+        save_steps=save_steps,
+        logging_steps=logging_steps,
+        eval_steps=eval_steps,
+        max_length=max_length,
+        gradient_accumulation_steps=gradient_accumulation_steps,
+        fp16=fp16,
+        seed=seed,
+    )
+    
+    # Check if training cache exists (unless force flag is set)
+    if not force and output_dir.exists():
+        if _check_cache(
+            output_dir=output_dir,
+            model_name=model_name,
+            train_data=train_data,
+            val_data=val_data,
+            config_hash=config_hash,
+        ):
+            console.print("[yellow]ℹ[/yellow] Model already trained with this configuration")
+            console.print(f"[dim]Using cached trained model from {output_dir}[/dim]")
+            
+            # Load and display cached metadata
+            metadata_file = output_dir / "training_metadata.json"
+            with open(metadata_file, "r", encoding="utf-8") as f:
+                metadata = json.load(f)
+            
+            console.print(f"[dim]Training samples: {metadata.get('training_samples', 'unknown')}[/dim]")
+            console.print(f"[dim]Validation samples: {metadata.get('validation_samples', 'unknown')}[/dim]")
+            console.print(f"[dim]Epochs: {metadata.get('training_params', {}).get('epochs', 'unknown')}[/dim]")
+            console.print("[dim]Use --force to re-train[/dim]")
+            
+            console.print("\n[bold green]═══════════════════════════════════════[/bold green]")
+            console.print("[bold green]Using cached training result![/bold green]")
+            console.print("[bold green]═══════════════════════════════════════[/bold green]")
+            console.print(f"[green]✓[/green] Trained model available at: {output_dir}")
+            return
+    elif force:
+        console.print("[dim]Force flag set, re-training even if cache exists...[/dim]")
 
     try:
         # Set random seed for reproducibility
@@ -293,27 +475,46 @@ def train(
 
         console.print("[green]✓[/green] Model and tokenizer saved")
 
-        # Save training summary
-        summary = {
+        # Save training metadata with cache information
+        train_mtime = train_data.stat().st_mtime
+        val_mtime = val_data.stat().st_mtime
+        
+        metadata = {
             "model_name": model_name,
+            "train_data_path": str(train_data),
+            "train_data_mtime": train_mtime,
+            "val_data_path": str(val_data),
+            "val_data_mtime": val_mtime,
+            "config_hash": config_hash,
+            "training_params": {
+                "epochs": epochs,
+                "batch_size": batch_size,
+                "learning_rate": learning_rate,
+                "warmup_steps": warmup_steps,
+                "save_steps": save_steps,
+                "logging_steps": logging_steps,
+                "eval_steps": eval_steps,
+                "max_length": max_length,
+                "gradient_accumulation_steps": gradient_accumulation_steps,
+                "fp16": fp16,
+                "seed": seed,
+            },
             "training_samples": len(train_data_list),
             "validation_samples": len(val_data_list),
-            "epochs": epochs,
-            "batch_size": batch_size,
-            "learning_rate": learning_rate,
             "total_steps": len(train_dataset) // batch_size * epochs,
+            "completed": True,
         }
 
-        summary_file = output_dir / "training_summary.json"
-        with open(summary_file, "w", encoding="utf-8") as f:
-            json.dump(summary, f, indent=2)
+        metadata_file = output_dir / "training_metadata.json"
+        with open(metadata_file, "w", encoding="utf-8") as f:
+            json.dump(metadata, f, indent=2)
 
         console.print("\n[bold green]═══════════════════════════════════════[/bold green]")
         console.print("[bold green]Training complete![/bold green]")
         console.print("[bold green]═══════════════════════════════════════[/bold green]")
         console.print(f"[green]✓[/green] Model saved to: {output_dir}")
         console.print(f"[green]✓[/green] Training logs: {output_dir}/logs")
-        console.print(f"[green]✓[/green] Training summary: {summary_file}")
+        console.print(f"[green]✓[/green] Training metadata: {metadata_file}")
 
     except Exception as e:
         console.print(f"[red]✗ Error during training:[/red] {str(e)}")

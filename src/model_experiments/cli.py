@@ -3,7 +3,7 @@
 import typer
 from rich.console import Console
 
-from model_experiments.commands import compare, dataset, evaluate, model, train
+from model_experiments.commands import compare, dataset, evaluate, experiment, model, train
 
 # Create the main CLI app
 app = typer.Typer(
@@ -21,6 +21,9 @@ app.add_typer(dataset.app, name="dataset", help="Dataset management commands")
 app.add_typer(model.app, name="model", help="Model management commands")
 
 # Add standalone commands
+app.command(name="run-experiment", help="Run a complete fine-tuning experiment end-to-end")(
+    experiment.run_experiment
+)
 app.command(name="train", help="Fine-tune a model on training data")(train.train)
 app.command(name="evaluate", help="Evaluate model performance on test data")(evaluate.evaluate)
 app.command(name="compare", help="Compare baseline and fine-tuned model performance")(

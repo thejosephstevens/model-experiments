@@ -1,0 +1,34 @@
+{
+  "experiment_id": "exp_20251107_112805_imdb_distilbert-base-uncased",
+  "dataset_name": "imdb",
+  "model_name": "distilbert-base-uncased",
+  "profile": "quick",
+  "profile_config": {
+    "description": "Fast testing profile with minimal samples",
+    "max_samples": 100,
+    "epochs": 1,
+    "batch_size": 32,
+    "learning_rate": 2e-05,
+    "warmup_steps": 50,
+    "save_steps": 500,
+    "logging_steps": 50,
+    "eval_steps": 250
+  },
+  "timestamp": "2025-11-07T11:28:37.662777",
+  "directories": {
+    "experiment_root": "experiments/exp_20251107_112805_imdb_distilbert-base-uncased",
+    "data": "experiments/exp_20251107_112805_imdb_distilbert-base-uncased/data",
+    "base_model": "experiments/exp_20251107_112805_imdb_distilbert-base-uncased/models/base",
+    "fine_tuned_model": "experiments/exp_20251107_112805_imdb_distilbert-base-uncased/models/fine-tuned",
+    "metrics": "experiments/exp_20251107_112805_imdb_distilbert-base-uncased/metrics",
+    "predictions": "experiments/exp_20251107_112805_imdb_distilbert-base-uncased/predictions",
+    "comparison": "experiments/exp_20251107_112805_imdb_distilbert-base-uncased/comparison"
+  },
+  "files": {
+    "base_metrics": "experiments/exp_20251107_112805_imdb_distilbert-base-uncased/metrics/base_model_metrics.json",
+    "fine_tuned_metrics": "experiments/exp_20251107_112805_imdb_distilbert-base-uncased/metrics/fine_tuned_metrics.json",
+    "base_predictions": "experiments/exp_20251107_112805_imdb_distilbert-base-uncased/predictions/base_predictions.jsonl",
+    "fine_tuned_predictions": "experiments/exp_20251107_112805_imdb_distilbert-base-uncased/predictions/fine_tuned_predictions.jsonl",
+    "comparison_report": "experiments/exp_20251107_112805_imdb_distilbert-base-uncased/comparison/report.html"
+  }
+}

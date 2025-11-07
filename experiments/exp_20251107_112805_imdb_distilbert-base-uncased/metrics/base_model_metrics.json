@@ -1,0 +1,16 @@
+{
+  "model_path": "experiments/exp_20251107_112805_imdb_distilbert-base-uncased/models/base",
+  "num_samples": 100,
+  "metrics": {
+    "accuracy": 0.46,
+    "f1": 0.2961643835616438,
+    "precision": 0.21838383838383837,
+    "recall": 0.46
+  },
+  "requested_metrics": [
+    "accuracy",
+    "f1",
+    "precision",
+    "recall"
+  ]
+}
