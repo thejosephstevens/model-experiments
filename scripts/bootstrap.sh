@@ -5,7 +5,7 @@
 # This script installs all necessary dependencies and sets up the environment
 # so you can run training locally.
 #
-# Usage: ./bootstrap.sh
+# Usage: ./scripts/bootstrap.sh
 # =============================================================================
 
 set -e  # Exit on error
@@ -209,7 +209,7 @@ echo ""
 echo "Next steps:"
 echo ""
 echo "  1. Run the quick demo (5 minutes):"
-echo "     ${GREEN}./quick_demo.sh${NC}"
+echo "     ${GREEN}./scripts/quick_demo.sh${NC}"
 echo ""
 echo "  2. Or run a custom training job:"
 echo "     ${GREEN}uv run model-experiments --help${NC}"
@@ -221,7 +221,7 @@ echo ""
 echo "For more information:"
 echo "  - Documentation: ./docs/"
 echo "  - Test suite: ./tests/"
-echo "  - Full demo: ./demo_usage.sh"
+echo "  - Full demo: ./scripts/demo_usage.sh"
 echo ""
 
 print_success "Happy experimenting! 🚀"

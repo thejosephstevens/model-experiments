@@ -388,6 +388,6 @@ For detailed documentation and examples, see:
 - **[README.md](./README.md)** - Project overview
 
 Run the demo scripts to see everything in action:
-- `./quick_demo.sh` - Fast 5-minute demo
-- `./demo_usage.sh` - Comprehensive example
+- `./scripts/quick_demo.sh` - Fast 5-minute demo
+- `./scripts/demo_usage.sh` - Comprehensive example
 

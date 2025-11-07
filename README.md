@@ -10,7 +10,7 @@ If you're setting up this project for the first time, run the bootstrap script:
 
 ```bash
 # Run bootstrap script (installs uv and all dependencies)
-./bootstrap.sh
+./scripts/bootstrap.sh
 ```
 
 The bootstrap script will:
@@ -26,7 +26,7 @@ After setup, run the quick demo to see the framework in action:
 
 ```bash
 # Run the quick demo
-./quick_demo.sh
+./scripts/quick_demo.sh
 ```
 
 This will download a small dataset, fine-tune a model, and generate a performance comparison report in ~5 minutes.
@@ -48,7 +48,7 @@ cd model-experiments
 
 # Run bootstrap script (recommended for first-time setup)
 # This will prompt you for CPU vs GPU PyTorch installation
-./bootstrap.sh
+./scripts/bootstrap.sh
 
 # Or manually install dependencies with UV
 uv sync
@@ -69,6 +69,7 @@ uv sync --extra torch-gpu    # For GPU with CUDA support
 
 ## 📚 Documentation
 
+- **[REPOSITORY_STRUCTURE.md](./REPOSITORY_STRUCTURE.md)** - Repository layout and organization
 - **[USAGE.md](./USAGE.md)** - Complete CLI reference and examples
 - **[docs/](./docs/)** - Implementation details and technical documentation
 - **[tests/](./tests/)** - Test suite and examples
@@ -88,7 +89,7 @@ The framework supports the following workflow:
 
 ### Quick Demo (5 minutes)
 ```bash
-./quick_demo.sh
+./scripts/quick_demo.sh
 ```
 - Small dataset (500 samples)
 - Tiny BERT model
@@ -97,7 +98,7 @@ The framework supports the following workflow:
 
 ### Full Demo (30 minutes)
 ```bash
-./demo_usage.sh
+./scripts/demo_usage.sh
 ```
 - Full dataset
 - Production model

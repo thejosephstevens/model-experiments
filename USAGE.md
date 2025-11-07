@@ -7,7 +7,7 @@ This document explains how to use the Model Fine-Tuning Framework CLI.
 Run the quick demo script to see the full workflow in action:
 
 ```bash
-./quick_demo.sh
+./scripts/quick_demo.sh
 ```
 
 This will:
@@ -23,7 +23,7 @@ This will:
 For a more comprehensive example with detailed configuration:
 
 ```bash
-./demo_usage.sh
+./scripts/demo_usage.sh
 ```
 
 This demonstrates all available options and best practices.

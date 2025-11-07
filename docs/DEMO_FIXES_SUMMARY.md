@@ -191,7 +191,7 @@ The complete demo workflow now works successfully:
 To run the complete demo:
 
 ```bash
-./demo_usage.sh
+./scripts/demo_usage.sh
 ```
 
 Or run individual steps:

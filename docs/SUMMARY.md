@@ -83,12 +83,12 @@ uv run model-experiments compare \
 
 ### Quick Test (5 minutes)
 ```bash
-./quick_demo.sh
+./scripts/quick_demo.sh
 ```
 
 ### Full Demo (20-30 minutes)
 ```bash
-./demo_usage.sh
+./scripts/demo_usage.sh
 ```
 
 ---
@@ -310,8 +310,8 @@ Both scripts include:
 
 | Need | See |
 |------|-----|
-| Run quick demo | `./quick_demo.sh` |
-| Run full demo | `./demo_usage.sh` |
+| Run quick demo | `./scripts/quick_demo.sh` |
+| Run full demo | `./scripts/demo_usage.sh` |
 | Learn all commands | `USAGE.md` |
 | Quick command lookup | `CLI_REFERENCE.md` |
 | Understand scripts | `SCRIPTS_README.md` |
@@ -340,5 +340,5 @@ Both scripts include:
 
 ---
 
-**Run `./quick_demo.sh` to see the complete workflow in action! 🚀**
+**Run `./scripts/quick_demo.sh` to see the complete workflow in action! 🚀**
 

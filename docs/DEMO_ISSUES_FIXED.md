@@ -135,7 +135,7 @@ echo ""
 
 Run the demo script:
 ```bash
-./demo_usage.sh
+./scripts/demo_usage.sh
 ```
 
 The script should now:

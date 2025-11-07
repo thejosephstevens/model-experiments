@@ -272,8 +272,8 @@ For each command:
 
 Once implementations are added, the demo scripts will work:
 ```bash
-./quick_demo.sh      # Fast 5-minute demo
-./demo_usage.sh      # Full comprehensive demo
+./scripts/quick_demo.sh      # Fast 5-minute demo
+./scripts/demo_usage.sh      # Full comprehensive demo
 ```
 
 ## Documentation

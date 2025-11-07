@@ -6,14 +6,14 @@ This document explains the demonstration scripts created for the Model Fine-Tuni
 
 ### Executable Scripts
 
-1. **`demo_usage.sh`** (8.5 KB) - Comprehensive demonstration
+1. **`scripts/demo_usage.sh`** (8.5 KB) - Comprehensive demonstration
    - Full workflow with detailed configuration
    - Shows all available CLI options
    - Production-ready settings
    - Extensive logging and comments
    - Estimated runtime: 20-30 minutes (with full dataset)
 
-2. **`quick_demo.sh`** (2.1 KB) - Fast minimal example
+2. **`scripts/quick_demo.sh`** (2.1 KB) - Fast minimal example
    - Streamlined workflow for quick testing
    - Small dataset (500 samples)
    - Tiny model for speed
@@ -51,7 +51,7 @@ These scripts serve as:
 
 ### Run the Fast Demo
 ```bash
-./quick_demo.sh
+./scripts/quick_demo.sh
 ```
 
 This executes the complete workflow in ~5 minutes:
@@ -64,7 +64,7 @@ This executes the complete workflow in ~5 minutes:
 
 ### Run the Full Demo
 ```bash
-./demo_usage.sh
+./scripts/demo_usage.sh
 ```
 
 This shows all features and options:
@@ -312,12 +312,12 @@ For most tasks, you should see:
 ### Scripts Won't Run
 ```bash
 # Make scripts executable
-chmod +x demo_usage.sh
-chmod +x quick_demo.sh
+chmod +x scripts/demo_usage.sh
+chmod +x scripts/quick_demo.sh
 
 # Run with bash explicitly
-bash demo_usage.sh
-bash quick_demo.sh
+bash scripts/demo_usage.sh
+bash scripts/quick_demo.sh
 ```
 
 ## 📚 Related Documentation
